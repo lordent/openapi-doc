@@ -8,7 +8,7 @@ setup(
     long_description='',
     author='Vitaliy Nefyodov',
     author_email='vitent@gmail.com',
-    packages=['openapi_doc'],
+    packages=['openapi_doc', 'openapi_doc/doc'],
     requires=['marshmallow'],
     classifiers=[
         'License :: OSI Approved :: BSD License',
