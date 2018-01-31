@@ -1,5 +1,7 @@
 import re
 
+from marshmallow.schema import Schema
+
 from .doc.path import OpenAPIPathParameter
 from .doc.schema import schema_to_dict
 
@@ -69,13 +71,14 @@ class OpenApi:
                         handler = getattr(view, method_name)
                         if hasattr(handler, '__openapi__'):
                             api_doc = handler.__openapi__
-                            api_doc.parameters += parameters
+                            api_doc.path_parameters = parameters
 
                             paths[uri_parsed][method_name] = api_doc.to_dict()
 
                             for schema in api_doc.schemas:
-                                schemas.update(
-                                    **schema_to_dict(schema, relations=schemas)
-                                )
+                                if isinstance(schema, Schema):
+                                    schemas.update(
+                                        **schema_to_dict(schema, relations=schemas)
+                                    )
 
         return self.spec

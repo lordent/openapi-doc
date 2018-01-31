@@ -1,3 +1,6 @@
+from marshmallow.schema import Schema
+
+
 class OpenAPIPath:
 
     def __init__(self):
@@ -6,7 +9,9 @@ class OpenAPIPath:
         self.operation_id = ''
         self.deprecated = False
         self.parameters = list()
+        self.path_parameters = list()
         self.tags = list()
+        self.request = dict()
         self.responses = dict()
         self.schemas = set()
 
@@ -16,15 +21,15 @@ class OpenAPIPath:
             description=self.description,
             operationId=self.operation_id,
             deprecated=self.deprecated,
-            parameters=self.parameters,
+            parameters=self.parameters + self.path_parameters,
+            requestBody=self.request,
             responses=self.responses,
             tags=self.tags,
         )
 
 
 class OpenAPIPathParameter:
-    def __init__(self, name='', in_='', description='', required=False,
-                 deprecated=False, allow_empty_value=False, type_=str):
+    def __init__(self, name, in_, description, required, deprecated, allow_empty_value, type_):
         self.name = name
         self.in_ = in_
         self.description = description
@@ -53,7 +58,7 @@ class OpenAPIPathParameter:
 
 
 class OpenAPIResponse:
-    def __init__(self, schema, array=False, status=200, description='', content='application/json'):
+    def __init__(self, schema, array, status, description, content):
         self.schema = schema
         self.array = array
         self.status = status
@@ -61,10 +66,9 @@ class OpenAPIResponse:
         self.content = content
 
     def to_dict(self):
-        if hasattr(self.schema, '__name__'):
-            ref = {'$ref': '#/components/schemas/' + self.schema.__name__}
-        else:
-            ref = {'type': 'string'}
+        ref = {'type': 'string'}
+        if isinstance(self.schema, Schema):
+            ref = {'$ref': '#/components/schemas/' + self.schema.__class__.__name__}
         if self.array:
             ref = {
                 'type': 'array',
@@ -80,29 +84,49 @@ class OpenAPIResponse:
         }
 
 
+class OpenAPIRequest:
+    def __init__(self, schema, required, description, content):
+        self.schema = schema
+        self.required = required
+        self.description = description
+        self.content = content
+
+    def to_dict(self):
+        ref = {'type': 'string'}
+        if isinstance(self.schema, Schema):
+            ref = {'$ref': '#/components/schemas/' + self.schema.__class__.__name__}
+        return {
+            'description': self.description,
+            'required': self.required,
+            'content': {
+                self.content: {'schema': ref},
+            },
+        }
+
+
 def openapi(func):
     if not hasattr(func, '__openapi__'):
         func.__openapi__ = OpenAPIPath()
     return func.__openapi__
 
 
-def summary(summary_=''):
+def summary(summary):
     def inner(func):
-        openapi(func).summary = summary_
+        openapi(func).summary = summary
         return func
     return inner
 
 
-def description(description_=''):
+def description(description):
     def inner(func):
-        openapi(func).description = description_
+        openapi(func).description = description
         return func
     return inner
 
 
-def operation_id(operation_id_=''):
+def operation_id(operation_id=''):
     def inner(func):
-        openapi(func).operation_id = operation_id_
+        openapi(func).operation_id = operation_id
         return func
     return inner
 
@@ -146,7 +170,20 @@ def parameter(
     return inner
 
 
-def response(schema, array=False, status=200, description='', content='application/json'):
+def request(schema=str, description='', required=False, content='application/json'):
+    def inner(func):
+        openapi(func).schemas.add(schema)
+        openapi(func).request = OpenAPIRequest(
+            schema=schema,
+            required=required,
+            description=description,
+            content=content,
+        ).to_dict()
+        return func
+    return inner
+
+
+def response(schema=str, array=False, status=200, description='', content='application/json'):
     def inner(func):
         openapi(func).schemas.add(schema)
         openapi(func).responses.update(

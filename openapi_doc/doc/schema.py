@@ -119,4 +119,4 @@ def schema_to_dict(schema, relations=None):
 
         return dict(required=required, properties=properties)
 
-    return {schema.__name__: serialize_fields(schema)}
+    return {schema.__class__.__name__: serialize_fields(schema)}
