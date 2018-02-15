@@ -14,18 +14,20 @@ class OpenAPIPath:
         self.request = dict()
         self.responses = dict()
         self.schemas = set()
+        self.roles = list()
 
     def to_dict(self):
-        return dict(
-            summary=self.summary,
-            description=self.description,
-            operationId=self.operation_id,
-            deprecated=self.deprecated,
-            parameters=self.parameters + self.path_parameters,
-            requestBody=self.request,
-            responses=self.responses,
-            tags=self.tags,
-        )
+        return {
+            'summary': self.summary,
+            'description': self.description,
+            'operationId': self.operation_id,
+            'deprecated': self.deprecated,
+            'parameters': self.parameters + self.path_parameters,
+            'requestBody': self.request,
+            'responses': self.responses,
+            'tags': self.tags,
+            'x-roles': self.roles,
+        }
 
 
 class OpenAPIPathParameter:
@@ -107,6 +109,13 @@ class OpenAPIRequest:
 def openapi(func):
     if not hasattr(func, '__openapi__'):
         func.__openapi__ = OpenAPIPath()
+    return func.__openapi__
+
+
+def roles(*args):
+    def inner(func):
+        openapi(func).roles += list(map(str, args))
+        return func
     return func.__openapi__
 
 
