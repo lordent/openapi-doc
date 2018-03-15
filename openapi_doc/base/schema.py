@@ -38,8 +38,6 @@ def schema_to_dict(schema, relations=None):
           type: string
     :param schema:
     :param relations:
-    :return:
-
     """
 
     def serialize_fields(schema):
