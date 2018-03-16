@@ -16,7 +16,7 @@ setup(
         'openapi_doc/base/path',
         'openapi_doc/spec',
     ],
-    setup_requires=['marshmallow'],
+    install_requires=['marshmallow'],
     tests_require=['tox', 'pytest'],
     classifiers=[
         'License :: OSI Approved :: BSD License',
