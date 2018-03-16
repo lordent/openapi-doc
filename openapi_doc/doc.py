@@ -31,9 +31,9 @@ def operation_id(operation_id=''):
     return inner
 
 
-def tags(*args):
+def tags(tags):
     def inner(func):
-        openapi(func).tags += list(map(str, args))
+        openapi(func).tags += list(map(str, tags))
         return func
     return inner
 
@@ -99,8 +99,8 @@ def response(schema=str, array=False, status=200, description='', content='appli
     return inner
 
 
-def x(name, *args):
+def x(name, values):
     def inner(func):
-        openapi(func).x[name] = args
+        openapi(func).x[name] = values
         return func
     return inner
