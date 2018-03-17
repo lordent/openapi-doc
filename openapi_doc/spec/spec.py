@@ -14,3 +14,6 @@ class OpenAPI:
             'components': self.components,
             **kwargs
         }
+
+    def to_dict(self, *args, **kwargs):
+        return self.spec
