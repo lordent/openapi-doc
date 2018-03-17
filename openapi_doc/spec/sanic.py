@@ -7,7 +7,7 @@ from ..base.schema import schema_to_dict
 
 from .spec import OpenAPI
 
-git s
+
 class OpenAPISanic(OpenAPI):
 
     def to_dict(self, app, url_prefix=''):
