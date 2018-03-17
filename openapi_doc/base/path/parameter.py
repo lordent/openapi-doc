@@ -12,6 +12,8 @@ class OpenAPIPathParameter:
     def get_type(value):
         if value is int:
             return 'integer'
+        if value is float:
+            return 'number'
         return 'string'
 
     def to_dict(self):

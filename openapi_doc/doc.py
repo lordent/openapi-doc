@@ -33,7 +33,7 @@ def operation_id(operation_id=''):
 
 def tags(tags):
     def inner(func):
-        openapi(func).tags += list(map(str, tags))
+        openapi(func).tags = list(map(str, tags))
         return func
     return inner
 

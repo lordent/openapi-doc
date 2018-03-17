@@ -1,6 +1,6 @@
 class OpenAPI:
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.paths = dict()
         self.schemas = dict()
 
@@ -10,6 +10,21 @@ class OpenAPI:
 
         self.spec = {
             'openapi': '3.0.0',
+            'info': {
+                'title': '',
+                'description': '',
+                'termsOfService': '',
+                'contact': {
+                    'name': '',
+                    'url': '',
+                    'email': '',
+                },
+                'license': {
+                    'name': '',
+                    'url': '',
+                },
+                'version': '',
+            },
             'paths': self.paths,
             'components': self.components,
             **kwargs
