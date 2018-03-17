@@ -64,13 +64,11 @@ def schema_to_dict(schema, relations=None):
             ):
                 continue
 
-            metadata_description = field_obj.metadata.get('description', '')
-            metadata_deprecated = field_obj.metadata.get('deprecated', False)
-            metadata_format = field_obj.metadata.get('format', '')
+            meta = field_obj.metadata.get('openapi', dict())
 
             properties[field_name] = {
-                'description': metadata_description,
-                'deprecated': metadata_deprecated,
+                'description': meta.get('description', ''),
+                'deprecated': meta.get('deprecated', ''),
             }
 
             if field_obj.required:
@@ -101,7 +99,7 @@ def schema_to_dict(schema, relations=None):
                     'type': 'array',
                     'items': {
                         'type': type_,
-                        'format': metadata_format or format_,
+                        'format': meta.get('format', '') or format_,
                     },
                 })
 
@@ -111,7 +109,7 @@ def schema_to_dict(schema, relations=None):
 
             properties[field_name].update(**{
                 'type': type_,
-                'format': metadata_format or format_,
+                'format': meta.get('format', '') or format_,
                 'nullable': field_obj.allow_none,
             })
 
