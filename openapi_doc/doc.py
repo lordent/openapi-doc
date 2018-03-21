@@ -55,8 +55,11 @@ def parameter(
     type_=str,
 ):
     def inner(func):
-        openapi(func).parameters.append(
-            OpenAPIPathParameter(
+        if in_ in ('query', 'path', 'header'):
+            getattr(
+                openapi(func),
+                'parameters_%s' % in_
+            )[name] = OpenAPIPathParameter(
                 name=name,
                 in_=in_,
                 description=description,
@@ -64,8 +67,7 @@ def parameter(
                 deprecated=deprecated,
                 allow_empty_value=allow_empty_value,
                 type_=type_,
-            ).to_dict()
-        )
+            )
         return func
     return inner
 
@@ -78,7 +80,7 @@ def request(schema=str, description='', required=False, content='application/jso
             required=required,
             description=description,
             content=content,
-        ).to_dict()
+        )
         return func
     return inner
 
@@ -86,14 +88,12 @@ def request(schema=str, description='', required=False, content='application/jso
 def response(schema=str, array=False, status=200, description='', content='application/json'):
     def inner(func):
         openapi(func).schemas.add(schema)
-        openapi(func).responses.update(
-            **OpenAPIResponse(
-                schema=schema,
-                array=array,
-                status=status,
-                description=description,
-                content=content,
-            ).to_dict()
+        openapi(func).responses[status] = OpenAPIResponse(
+            schema=schema,
+            array=array,
+            status=status,
+            description=description,
+            content=content,
         )
         return func
     return inner

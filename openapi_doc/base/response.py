@@ -13,16 +13,16 @@ class OpenAPIResponse:
         ref = {'type': 'string'}
         if isinstance(self.schema, Schema):
             ref = {'$ref': '#/components/schemas/' + self.schema.__class__.__name__}
+        if isinstance(self.schema, dict):
+            ref = self.schema
         if self.array:
             ref = {
                 'type': 'array',
                 'items': ref,
             }
         return {
-            str(self.status): {
-                'description': self.description,
-                'content': {
-                    self.content: {'schema': ref},
-                },
+            'description': self.description,
+            'content': {
+                self.content: {'schema': ref},
             },
         }

@@ -5,8 +5,9 @@ class OpenAPIPath:
         self.description = None
         self.operation_id = None
         self.deprecated = None
-        self.parameters = list()
-        self.path_parameters = list()
+        self.parameters_query = dict()
+        self.parameters_path = dict()
+        self.parameters_header = dict()
         self.tags = None
         self.request = None
         self.responses = dict()
@@ -20,10 +21,27 @@ class OpenAPIPath:
                 ('description', self.description),
                 ('operationId', self.operation_id),
                 ('deprecated', self.deprecated),
-                ('parameters', self.parameters + self.path_parameters),
-                ('requestBody', self.request or None),
-                ('responses', self.responses),
                 ('tags', self.tags),
+                (
+                    'parameters',
+                    list(map(lambda p: p.to_dict(),
+                             self.parameters_query.values())) +
+                    list(map(lambda p: p.to_dict(),
+                             self.parameters_path.values())) +
+                    list(map(lambda p: p.to_dict(),
+                             self.parameters_header.values()))
+                ),
+                (
+                    'requestBody',
+                    self.request.to_dict() if self.request else None
+                ),
+                (
+                    'responses',
+                    {
+                        str(status): response.to_dict()
+                        for status, response in self.responses.items()
+                    }
+                ),
             ]),
             **{
                 'x-%s' % name: list(map(str, args))

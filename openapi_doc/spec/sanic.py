@@ -19,7 +19,10 @@ class OpenAPISanic(OpenAPI):
     def add_method_handler(self, uri, path_parameters, method_name, handler):
         if hasattr(handler, '__openapi__'):
             api_doc = handler.__openapi__
-            api_doc.path_parameters = path_parameters
+            api_doc.parameters_path = {
+                **path_parameters,
+                **api_doc.parameters_path
+            }
 
             self.paths[uri][method_name] = api_doc.to_dict()
 
@@ -41,7 +44,7 @@ class OpenAPISanic(OpenAPI):
             if uri_parsed[0] != '/':
                 uri_parsed = '/' + uri_parsed
 
-            path_parameters = []
+            path_parameters = dict()
 
             for parameter in route.parameters:
                 description = re.compile('<' + parameter.name + ':([^>]+)>').findall(uri_parsed)
@@ -50,7 +53,7 @@ class OpenAPISanic(OpenAPI):
 
                 uri_parsed = re.sub('<' + parameter.name + '.*?>', '{' + parameter.name + '}', uri_parsed)
 
-                path_parameters.append(OpenAPIPathParameter(
+                path_parameters[parameter.name] = OpenAPIPathParameter(
                     name=parameter.name,
                     in_='path',
                     description=description,
@@ -58,7 +61,7 @@ class OpenAPISanic(OpenAPI):
                     deprecated=False,
                     allow_empty_value=False,
                     type_=parameter.cast,
-                ).to_dict())
+                )
 
             self.paths[uri_parsed] = dict()
 

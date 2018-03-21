@@ -1,7 +1,7 @@
 from openapi_doc import doc
 from openapi_doc.base.path import OpenAPIPath
 
-from .constants import check_method_spec, fix_doc_settings  # noqa
+from .fixtures import check_method_spec, fix_doc_settings  # noqa
 
 
 def test_base_doc_decorators(fix_doc_settings):
