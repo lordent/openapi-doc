@@ -55,7 +55,7 @@ def parameter(
     type_=str,
 ):
     def inner(func):
-        if in_ in ('query', 'path', 'header'):
+        if in_ in ('query', 'path', 'header', 'cookie'):
             getattr(
                 openapi(func),
                 'parameters_%s' % in_

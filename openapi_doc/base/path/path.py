@@ -1,3 +1,7 @@
+from functools import reduce
+import operator
+
+
 class OpenAPIPath:
 
     def __init__(self):
@@ -8,6 +12,7 @@ class OpenAPIPath:
         self.parameters_query = dict()
         self.parameters_path = dict()
         self.parameters_header = dict()
+        self.parameters_cookie = dict()
         self.tags = None
         self.request = None
         self.responses = dict()
@@ -24,12 +29,18 @@ class OpenAPIPath:
                 ('tags', self.tags),
                 (
                     'parameters',
-                    list(map(lambda p: p.to_dict(),
-                             self.parameters_query.values())) +
-                    list(map(lambda p: p.to_dict(),
-                             self.parameters_path.values())) +
-                    list(map(lambda p: p.to_dict(),
-                             self.parameters_header.values()))
+                    reduce(
+                        operator.concat, list(
+                            list(map(
+                                lambda p: p.to_dict(), parameters.values()))
+                            for parameters in (
+                                self.parameters_query,
+                                self.parameters_path,
+                                self.parameters_header,
+                                self.parameters_cookie,
+                            )
+                        )
+                    )
                 ),
                 (
                     'requestBody',
